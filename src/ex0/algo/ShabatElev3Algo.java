@@ -63,13 +63,17 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         Elevator e = (Elevator) building.getElevetor(elev);
         if (e.getState() == Elevator.LEVEL) {
             Queue<CallForElevator> queue = eQueue[elev];
+            // delete completed tasks
+            if (!queue.isEmpty() && queue.peek().getState() == CallForElevator.DONE)
+                queue.poll();
             if (!queue.isEmpty()) {
-                // delete completed tasks
-                if (queue.peek().getState() == CallForElevator.DONE)
-                    queue.poll();
                 // goto next task
-                e.goTo(queue.peek().getState() == CallForElevator.GOIND2DEST ? queue.poll().getDest()
-                        : queue.peek().getSrc());
+                try {
+                    e.goTo(queue.peek().getState() == CallForElevator.GOIND2DEST ? queue.poll().getDest()
+                            : queue.peek().getSrc());
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
         }
     }
