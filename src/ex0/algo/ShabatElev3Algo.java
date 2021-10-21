@@ -17,7 +17,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
 
     //
     private Boolean[] freeElevators;
-    private Queue<CallForElevator>[] eQueue;
+    private LinkedList<CallForElevator>[] eQueue;
 
     @SuppressWarnings("unchecked")
     public ShabatElev3Algo(Building b) {
@@ -47,12 +47,29 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     @Override
     public int allocateAnElevator(CallForElevator c) {
         // Let's start with sending an free elevator, and sending it
-        int min = Integer.MAX_VALUE, imin = 0;
+        double min = Integer.MAX_VALUE;
+        int imin = 0;
         for (int i = 0; i < eQueue.length; i++) {
-            if (eQueue[i].size() < min) {
-                min = eQueue[i].size();
+            int stops = 0, floors = 0;
+            for (int j = 0; j < eQueue[i].size(); j++) {
+                CallForElevator call = eQueue[i].get(j);
+                if (call.getState() == CallForElevator.GOING2SRC) {
+                    floors += Math.abs(building.getElevetor(i).getPos() - call.getSrc());
+                    floors += Math.abs(call.getSrc() - call.getDest());
+                    stops += 2;
+                }
+                if (call.getState() == CallForElevator.GOIND2DEST) {
+                    floors += Math.abs(building.getElevetor(i).getPos() - call.getDest());
+                    stops++;
+                }
+
+            }
+            Double time = findTimeToFloor(floors, stops, i);
+            if (time < min) {
+                min = time;
                 imin = i;
             }
+
         }
         eQueue[imin].add(c);
         return imin;
@@ -76,5 +93,19 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 }
             }
         }
+    }
+
+    /**
+     * Calculates the time required to (pickup / drop ) (from / to) floor using this
+     * formula closeTime + startTime + speed*numberOfFloors + stopTime + openTime
+     * 
+     * @param id          of elevator
+     * @param destenation floor
+     * @return time Time of operation
+     */
+    private double findTimeToFloor(int floors, int stops, int elev) {
+        Elevator e = building.getElevetor(elev);
+        return ((e.getTimeForClose() + e.getStartTime()) * stops) + (e.getSpeed() * floors)
+                + ((e.getStopTime() + e.getTimeForOpen()) * stops);
     }
 }
