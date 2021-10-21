@@ -1,10 +1,8 @@
 package ex0.algo;
 
-import java.lang.Thread.State;
-import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 
 public class ElevSup {
 
@@ -14,29 +12,35 @@ public class ElevSup {
 
     private int dest;
     private int pos;
-    private PriorityQueue<Job> stops;
+    private int currentTrip;
+    private boolean pickedup;
+    private HashMap<Integer, LinkedList<Integer>> stops;
     private STATES state;
 
     ElevSup() {
         state = STATES.IDLE;
         dest = Integer.MAX_VALUE;
         pos = 0;
-        stops = new PriorityQueue<Job>();
+        currentTrip = 0;
+        stops = new HashMap<Integer, LinkedList<Integer>>();
     }
 
-    public void addDest(int dest) {
-        var job = new Job(dest, 1);
-        stops.add(job);
-    }
-
-    public void addSrc(int dest) {
-        var job = new Job(dest, 0);
-        stops.add(job);
+    public void addTrip(int src, int dest) {
+        stops.putIfAbsent(src, new LinkedList<>());
+        stops.get(src).add(dest);
     }
 
     public void setPos(int pos) {
-        stops.remove(new Job(pos, 0));
-        stops.remove(new Job(pos, 1));
+        if (stops.get(currentTrip) != null)
+            stops.get(currentTrip).remove((Integer) pos);
+        if (pos == currentTrip) {
+            pickedup = true;
+            if (stops.get(currentTrip) != null)
+                if (stops.get(currentTrip).peek() > currentTrip)
+                    stops.get(currentTrip).sort(Comparator.naturalOrder());
+                else
+                    stops.get(currentTrip).sort(Comparator.reverseOrder());
+        }
         this.pos = pos;
     }
 
@@ -60,9 +64,16 @@ public class ElevSup {
     }
 
     public int nextStop() {
-        if (stops.isEmpty())
+        if (stops.size() == 0)
             return Integer.MAX_VALUE;
-        return stops.peek().getFloor();
+        if (stops.get(currentTrip) == null) {
+            currentTrip = findNextPassenger();
+        }
+        if (stops.get(currentTrip).size() == 0) {
+            stops.remove(currentTrip);
+            currentTrip = findNextPassenger();
+        }
+        return pickedup ? stops.get(currentTrip).peek() : currentTrip;
     }
 
     public int getDest() {
@@ -75,6 +86,19 @@ public class ElevSup {
 
     public STATES getState() {
         return state;
+    }
+
+    private int findNextPassenger() {
+        pickedup = false;
+        int ret = 0;
+        int minDistance = Integer.MAX_VALUE;
+        for (int i : stops.keySet()) {
+            if (Math.abs(pos - i) < minDistance) {
+                minDistance = Math.abs(pos - i);
+                ret = i;
+            }
+        }
+        return ret;
     }
 
 }

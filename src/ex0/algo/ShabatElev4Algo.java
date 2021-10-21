@@ -38,9 +38,8 @@ public class ShabatElev4Algo implements ElevatorAlgo {
         var retElevator = findFreeElevator(c.getSrc(), c.getDest());
         if (retElevator == Integer.MAX_VALUE)
             retElevator = 0;
-        // TODO :step 3 calculate the next free elevator
-        eQueue[retElevator].addSrc(c.getSrc());
-        eQueue[retElevator].addDest(c.getDest());
+
+        eQueue[retElevator].addTrip(c.getSrc(), c.getDest());
         return retElevator;
     }
 
