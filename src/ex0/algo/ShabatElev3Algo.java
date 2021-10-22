@@ -43,8 +43,6 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     /**
      * The basic logic here is to determine if there is an available elevator to
      * send or is it simply better to send one that is on the way
-     * 
-     * TODO: try and implement stops.
      */
     @Override
     public int allocateAnElevator(CallForElevator c) {
@@ -69,7 +67,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         if (e.getState() == Elevator.LEVEL) {
             ElevatorSupreviser queue = eQueue[elev];
             // delete completed tasks
-            if (!queue.isEmpty() && queue.peek().getState() == CallForElevator.DONE)
+            while (!queue.isEmpty() && queue.peek().getState() == CallForElevator.DONE)
                 queue.poll();
             if (!queue.isEmpty()) {
                 // goto next task

@@ -75,9 +75,7 @@ public class ElevatorSupreviser {
         Vector<Integer> ret = new Vector<Integer>();
         if (type == CallForElevator.UP) {
             for (CallForElevator c : stops) {
-                if (c.getType() == CallForElevator.DOWN)
-                    continue;
-                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() > pos) {
+                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() > pos && c.getSrc() != dest) {
                     ret.add(c.getSrc());
                 }
                 if (c.getState() == CallForElevator.GOIND2DEST && c.getDest() < dest) {
@@ -86,9 +84,7 @@ public class ElevatorSupreviser {
             }
         } else {
             for (CallForElevator c : stops) {
-                if (c.getType() == CallForElevator.UP)
-                    continue;
-                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() < pos) {
+                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() < pos && c.getSrc() != dest) {
                     ret.add(c.getSrc());
                 }
                 if (c.getState() == CallForElevator.GOIND2DEST && c.getDest() > dest) {
