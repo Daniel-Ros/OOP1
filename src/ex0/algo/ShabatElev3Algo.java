@@ -2,6 +2,7 @@ package ex0.algo;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Vector;
 
 import ex0.Building;
 import ex0.CallForElevator;
@@ -19,7 +20,6 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     private Boolean[] freeElevators;
     private ElevatorSupreviser[] eQueue;
 
-    @SuppressWarnings("unchecked")
     public ShabatElev3Algo(Building b) {
         building = b;
         freeElevators = new Boolean[building.numberOfElevetors()];
@@ -52,21 +52,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         double min = Integer.MAX_VALUE;
         int imin = 0;
         for (int i = 0; i < eQueue.length; i++) {
-            int stops = 0, floors = 0;
-            for (int j = 0; j < eQueue[i].getGumberOfCalls(); j++) {
-                CallForElevator call = eQueue[i].getCall(j);
-                if (call.getState() == CallForElevator.GOING2SRC) {
-                    floors += Math.abs(building.getElevetor(i).getPos() - call.getSrc());
-                    floors += Math.abs(call.getSrc() - call.getDest());
-                    stops += 2;
-                }
-                if (call.getState() == CallForElevator.GOIND2DEST) {
-                    floors += Math.abs(building.getElevetor(i).getPos() - call.getDest());
-                    stops++;
-                }
-
-            }
-            Double time = findTimeToFloor(floors, stops, i);
+            Double time = eQueue[i].bid(building.getElevetor(i), c);
             if (time < min) {
                 min = time;
                 imin = i;
@@ -81,33 +67,39 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     public void cmdElevator(int elev) {
         Elevator e = (Elevator) building.getElevetor(elev);
         if (e.getState() == Elevator.LEVEL) {
-            Queue<CallForElevator> queue = eQueue[elev].getQueue();
+            ElevatorSupreviser queue = eQueue[elev];
             // delete completed tasks
             if (!queue.isEmpty() && queue.peek().getState() == CallForElevator.DONE)
                 queue.poll();
             if (!queue.isEmpty()) {
                 // goto next task
                 try {
-                    e.goTo(queue.peek().getState() == CallForElevator.GOIND2DEST ? queue.poll().getDest()
-                            : queue.peek().getSrc());
+                    int type = queue.peek().getType();
+                    int stop = queue.peek().getState() == CallForElevator.GOIND2DEST ? queue.peek().getDest()
+                            : queue.peek().getSrc();
+                    e.goTo(stop);
+
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
                 }
             }
+        } else if (e.getState() == Elevator.UP) {
+            ElevatorSupreviser queue = eQueue[elev];
+            int stop = queue.peek().getType() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
+                    : queue.peek().getDest();
+            Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.UP);
+            for (Integer s : stops) {
+                e.stop(s);
+            }
+        } else if (e.getState() == Elevator.DOWN) {
+            ElevatorSupreviser queue = eQueue[elev];
+            int stop = queue.peek().getType() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
+                    : queue.peek().getDest();
+            Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.DOWN);
+            for (Integer s : stops) {
+                e.stop(s);
+            }
         }
     }
 
-    /**
-     * Calculates the time required to (pickup / drop ) (from / to) floor using this
-     * formula closeTime + startTime + speed*numberOfFloors + stopTime + openTime
-     * 
-     * @param id          of elevator
-     * @param destenation floor
-     * @return time Time of operation
-     */
-    private double findTimeToFloor(int floors, int stops, int elev) {
-        Elevator e = building.getElevetor(elev);
-        return ((e.getTimeForClose() + e.getStartTime()) * stops) + (e.getSpeed() * floors)
-                + ((e.getStopTime() + e.getTimeForOpen()) * stops);
-    }
 }
