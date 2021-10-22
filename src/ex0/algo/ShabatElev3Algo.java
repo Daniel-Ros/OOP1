@@ -17,16 +17,16 @@ public class ShabatElev3Algo implements ElevatorAlgo {
 
     //
     private Boolean[] freeElevators;
-    private LinkedList<CallForElevator>[] eQueue;
+    private ElevatorSupreviser[] eQueue;
 
     @SuppressWarnings("unchecked")
     public ShabatElev3Algo(Building b) {
         building = b;
         freeElevators = new Boolean[building.numberOfElevetors()];
-        eQueue = new LinkedList[building.numberOfElevetors()];
+        eQueue = new ElevatorSupreviser[building.numberOfElevetors()];
         for (int i = 0; i < building.numberOfElevetors(); i++) {
             freeElevators[i] = true;
-            eQueue[i] = new LinkedList<CallForElevator>();
+            eQueue[i] = new ElevatorSupreviser();
         }
     }
 
@@ -43,6 +43,8 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     /**
      * The basic logic here is to determine if there is an available elevator to
      * send or is it simply better to send one that is on the way
+     * 
+     * TODO: try and implement stops.
      */
     @Override
     public int allocateAnElevator(CallForElevator c) {
@@ -51,8 +53,8 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         int imin = 0;
         for (int i = 0; i < eQueue.length; i++) {
             int stops = 0, floors = 0;
-            for (int j = 0; j < eQueue[i].size(); j++) {
-                CallForElevator call = eQueue[i].get(j);
+            for (int j = 0; j < eQueue[i].getGumberOfCalls(); j++) {
+                CallForElevator call = eQueue[i].getCall(j);
                 if (call.getState() == CallForElevator.GOING2SRC) {
                     floors += Math.abs(building.getElevetor(i).getPos() - call.getSrc());
                     floors += Math.abs(call.getSrc() - call.getDest());
@@ -79,7 +81,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     public void cmdElevator(int elev) {
         Elevator e = (Elevator) building.getElevetor(elev);
         if (e.getState() == Elevator.LEVEL) {
-            Queue<CallForElevator> queue = eQueue[elev];
+            Queue<CallForElevator> queue = eQueue[elev].getQueue();
             // delete completed tasks
             if (!queue.isEmpty() && queue.peek().getState() == CallForElevator.DONE)
                 queue.poll();
