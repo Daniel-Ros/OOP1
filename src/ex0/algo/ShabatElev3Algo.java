@@ -1,7 +1,5 @@
 package ex0.algo;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Vector;
 
 import ex0.Building;
@@ -42,7 +40,8 @@ public class ShabatElev3Algo implements ElevatorAlgo {
 
     /**
      * The basic logic here is to determine if there is an available elevator to
-     * send or is it simply better to send one that is on the way
+     * send or is it simply better to send oneimport ex0.algo.ShabatElev3AlgoCopy;
+     * import ex0.algo.ShabatElev4Algo; that is on the way
      */
     @Override
     public int allocateAnElevator(CallForElevator c) {
@@ -55,7 +54,6 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 min = time;
                 imin = i;
             }
-
         }
         eQueue[imin].add(c);
         return imin;
@@ -71,19 +69,13 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 queue.poll();
             if (!queue.isEmpty()) {
                 // goto next task
-                try {
-                    int type = queue.peek().getType();
-                    int stop = queue.peek().getState() == CallForElevator.GOIND2DEST ? queue.peek().getDest()
-                            : queue.peek().getSrc();
-                    e.goTo(stop);
-
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                }
+                int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
+                        : queue.peek().getDest();
+                e.goTo(stop);
             }
         } else if (e.getState() == Elevator.UP) {
             ElevatorSupreviser queue = eQueue[elev];
-            int stop = queue.peek().getType() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
+            int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
                     : queue.peek().getDest();
             Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.UP);
             for (Integer s : stops) {
@@ -91,7 +83,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
             }
         } else if (e.getState() == Elevator.DOWN) {
             ElevatorSupreviser queue = eQueue[elev];
-            int stop = queue.peek().getType() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
+            int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
                     : queue.peek().getDest();
             Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.DOWN);
             for (Integer s : stops) {

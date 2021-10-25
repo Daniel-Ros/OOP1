@@ -9,65 +9,79 @@ import ex0.Elevator;
 
 public class ElevatorSupreviser {
     LinkedList<CallForElevator> stops;
-    int lastState;
 
     ElevatorSupreviser() {
         stops = new LinkedList<CallForElevator>();
     }
 
     public double bid(Elevator e, CallForElevator c) {
+        stops.add(c);
         HashSet<Integer> picked = new HashSet<Integer>();
+        HashSet<Integer> dropped = new HashSet<Integer>();
         if (stops.size() == 0) {
+            stops.remove(c);
             return findTimeToFloor(e.getPos(), c.getSrc(), e);
         }
         int acc = 0;
-        acc += findTimeToFloor(e.getPos(), stops.peek().getSrc(), e);
-        acc += findTimeToFloor(stops.peek().getSrc(), stops.peek().getDest(), e);
+        if (stops.peek().getState() == CallForElevator.GOING2SRC)
+            acc += findTimeToFloor(e.getPos(), stops.peek().getSrc(), e);
+        if (stops.peek().getState() != CallForElevator.DONE)
+            acc += findTimeToFloor(stops.peek().getSrc(), stops.peek().getDest(), e);
         picked.add(stops.peek().getSrc());
         picked.add(stops.peek().getDest());
+        dropped.add(stops.peek().getDest());
         int lastFloor = stops.peek().getDest();
         for (int i = 1; i < stops.size(); i++) {
+            if (stops.get(i).getState() == CallForElevator.DONE) {
+                continue;
+            }
 
+            // sources
             if (!picked.contains(stops.get(i).getSrc())) {
+                if (stops.get(i).getState() == CallForElevator.GOIND2DEST) {
+                    continue;
+                }
+                Vector<Integer> middleStops = getStops(stops.get(i).getSrc(), lastFloor,
+                        lastFloor > stops.get(i).getSrc() ? CallForElevator.UP : CallForElevator.DOWN);
+                for (Integer s : middleStops) {
+                    picked.add(s);
+                    dropped.add(s);
+                    acc += findTimeToFloor(lastFloor, s, e);
+                    lastFloor = s;
+                }
+                picked.add(stops.get(i).getSrc());
                 acc += findTimeToFloor(lastFloor, stops.get(i).getSrc(), e);
-                lastFloor = stops.peek().getSrc();
-                if (c.getSrc() == lastFloor) {
-                    return acc;
+                lastFloor = stops.get(i).getSrc();
+            }
+
+            // destnetions
+            if (!dropped.contains(stops.get(i).getDest())) {
+                Vector<Integer> middleStops = getStops(stops.get(i).getSrc(), lastFloor,
+                        lastFloor > stops.get(i).getDest() ? CallForElevator.UP : CallForElevator.DOWN);
+                for (Integer s : middleStops) {
+                    picked.add(s);
+                    dropped.add(s);
+                    acc += findTimeToFloor(lastFloor, s, e);
+                    lastFloor = s;
+                }
+                picked.add(stops.get(i).getDest());
+                dropped.add(stops.get(i).getDest());
+                acc += findTimeToFloor(lastFloor, stops.get(i).getDest(), e);
+                lastFloor = stops.get(i).getDest();
+
+                // TODO check is improves
+                if (picked.contains(c.getSrc()) && dropped.contains(c.getDest())) {
+                    stops.remove(c);
+                    // return acc;
                 }
             }
-            acc += findTimeToFloor(lastFloor, stops.get(i).getDest(), e);
-            lastFloor = stops.peek().getDest();
-            if (c.getSrc() == lastFloor) {
-                return acc;
-            }
         }
+
+        stops.remove(c);
         return acc;
     }
 
     public void add(CallForElevator c) {
-        for (int i = 0; i < stops.size(); i++) {
-            // Same source and direction so let's pack it up!
-            // If it up call, put is above, if its down call so put it below
-            if (c.getSrc() == stops.get(i).getSrc() && c.getType() == stops.get(i).getType()) {
-                if (c.getType() == CallForElevator.UP) { // UP
-                    if (c.getDest() > stops.get(i).getDest()) {
-                        while (i < stops.size() && stops.get(i).getSrc() == c.getSrc())
-                            i++;
-                        stops.add(i, c);
-                    } else
-                        stops.add(i, c);
-                } else { // DOWN
-                    if (c.getDest() > stops.get(i).getDest())
-                        stops.add(i, c);
-                    else {
-                        while (i < stops.size() && stops.get(i).getSrc() == c.getSrc())
-                            i++;
-                        stops.add(i, c);
-                    }
-                }
-                break;
-            }
-        }
         stops.add(c);
     }
 
@@ -75,19 +89,19 @@ public class ElevatorSupreviser {
         Vector<Integer> ret = new Vector<Integer>();
         if (type == CallForElevator.UP) {
             for (CallForElevator c : stops) {
-                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() > pos && c.getSrc() != dest) {
+                if (c.getState() == CallForElevator.GOING2SRC && pos < c.getSrc() && c.getSrc() < dest) {
                     ret.add(c.getSrc());
                 }
-                if (c.getState() == CallForElevator.GOIND2DEST && c.getDest() < dest) {
+                if (c.getState() == CallForElevator.GOIND2DEST && pos < c.getDest() && c.getDest() < dest) {
                     ret.add(c.getDest());
                 }
             }
         } else {
             for (CallForElevator c : stops) {
-                if (c.getState() == CallForElevator.GOING2SRC && c.getSrc() < pos && c.getSrc() != dest) {
+                if (c.getState() == CallForElevator.GOING2SRC && dest < c.getSrc() && c.getSrc() < pos) {
                     ret.add(c.getSrc());
                 }
-                if (c.getState() == CallForElevator.GOIND2DEST && c.getDest() > dest) {
+                if (c.getState() == CallForElevator.GOIND2DEST && dest < c.getDest() && c.getDest() < pos) {
                     ret.add(c.getDest());
                 }
             }
@@ -103,11 +117,6 @@ public class ElevatorSupreviser {
         return stops.get(i);
     }
 
-    public LinkedList<CallForElevator> getQueue() {
-
-        return stops;
-    }
-
     public boolean isEmpty() {
         return stops.isEmpty();
     }
@@ -117,7 +126,6 @@ public class ElevatorSupreviser {
     }
 
     public CallForElevator poll() {
-        lastState = stops.peek().getType();
         return stops.poll();
     }
 
