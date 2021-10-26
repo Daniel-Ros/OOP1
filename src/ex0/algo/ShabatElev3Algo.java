@@ -44,7 +44,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         int imin = 0;
         for (int i = 0; i < eQueue.length; i++) {
             Double time = eQueue[i].bid(building.getElevetor(i), c);
-            if (time < min) {
+            if (time <= min) {
                 min = time;
                 imin = i;
             }

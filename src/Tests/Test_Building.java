@@ -13,7 +13,7 @@ public class Test_Building implements Building {
         this.min=min;
         this.max=max;
         this.numOfElevators=numOfElevators;
-        elevators=new Test_Elevator [numOfElevators]();
+        elevators = new Test_Elevator [numOfElevators];
     }
 
     @Override

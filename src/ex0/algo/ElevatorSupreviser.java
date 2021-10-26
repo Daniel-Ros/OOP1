@@ -62,8 +62,8 @@ public class ElevatorSupreviser {
 
             // sources
             if (!picked.contains(stops.get(i).getSrc()) && stops.get(i).getState() < CallForElevator.GOIND2DEST) {
-                // calculate the stops along a path using the original method so we get
-                // consistent resualts
+                // calculate the stops along a path using the original method, so we get
+                // consistent results
                 Vector<Integer> middleStops = getStops(lastFloor, stops.get(i).getSrc(),
                         lastFloor > stops.get(i).getSrc() ? CallForElevator.UP : CallForElevator.DOWN);
                 for (Integer s : middleStops) {
@@ -129,7 +129,7 @@ public class ElevatorSupreviser {
                     if (!mStops.contains(c.getDest()))
                         ret.add(c.getDest());
                 }
-                ret.sort(Comparator.naturalOrder());
+                ret.sort(Comparator.reverseOrder());
             }
         } else {
             for (CallForElevator c : stops) {
@@ -142,7 +142,7 @@ public class ElevatorSupreviser {
                         ret.add(c.getDest());
                 }
             }
-            ret.sort(Comparator.reverseOrder());
+            ret.sort(Comparator.naturalOrder());
         }
         mStops.addAll(ret);
         return ret;
@@ -197,8 +197,9 @@ public class ElevatorSupreviser {
      * Calculates the time required to (pickup / drop ) (from / to) floor using this
      * formula closeTime + startTime + numberOfFloors / speed + stopTime + openTime
      * 
-     * @param id          of elevator
-     * @param destenation floor
+     * @param pos     of elevator
+     * @param dest    floor
+     * @param e       the elevator(to get the speed data)
      * @return time Time of operation
      */
     private double findTimeToFloor(int pos, int dest, Elevator e) {
