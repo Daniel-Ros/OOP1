@@ -72,11 +72,10 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 e.goTo(stop);
             }
         }
-        // this 2 next if statment checks if we can stop on our way.
+        // this next if statment checks if we can stop on our way.
         else if (e.getState() != Elevator.ERROR) {
             ElevatorSupreviser queue = eQueue[elev];
-            int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
-                    : queue.peek().getDest();
+            int stop = queue.getStopWithoutReset();
             Vector<Integer> stops = queue.getStops(e.getPos(), stop, e.getState());
             for (Integer s : stops) {
                 e.stop(s);
