@@ -13,17 +13,12 @@ import ex0.Elevator;
 public class ShabatElev3Algo implements ElevatorAlgo {
 
     private Building building;
-
-    //
-    private Boolean[] freeElevators;
     private ElevatorSupreviser[] eQueue;
 
     public ShabatElev3Algo(Building b) {
         building = b;
-        freeElevators = new Boolean[building.numberOfElevetors()];
         eQueue = new ElevatorSupreviser[building.numberOfElevetors()];
         for (int i = 0; i < building.numberOfElevetors(); i++) {
-            freeElevators[i] = true;
             eQueue[i] = new ElevatorSupreviser();
         }
     }
@@ -39,9 +34,8 @@ public class ShabatElev3Algo implements ElevatorAlgo {
     }
 
     /**
-     * The basic logic here is to determine if there is an available elevator to
-     * send or is it simply better to send oneimport ex0.algo.ShabatElev3AlgoCopy;
-     * import ex0.algo.ShabatElev4Algo; that is on the way
+     * this function allocates an elevator by calculating how much each elevator
+     * would the to finish the job and picking this one
      */
     @Override
     public int allocateAnElevator(CallForElevator c) {
@@ -59,9 +53,14 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         return imin;
     }
 
+    /**
+     * send each elevator to its next stop and checks if given elevator can stop on
+     * its way there
+     */
     @Override
     public void cmdElevator(int elev) {
         Elevator e = (Elevator) building.getElevetor(elev);
+        // gets the next stop and tell the elevator to go there
         if (e.getState() == Elevator.LEVEL) {
             ElevatorSupreviser queue = eQueue[elev];
             // delete completed tasks
@@ -69,23 +68,16 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 queue.poll();
             if (!queue.isEmpty()) {
                 // goto next task
-                int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
-                        : queue.peek().getDest();
+                int stop = queue.getStop();
                 e.goTo(stop);
             }
-        } else if (e.getState() == Elevator.UP) {
+        }
+        // this 2 next if statment checks if we can stop on our way.
+        else if (e.getState() != Elevator.ERROR) {
             ElevatorSupreviser queue = eQueue[elev];
             int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
                     : queue.peek().getDest();
-            Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.UP);
-            for (Integer s : stops) {
-                e.stop(s);
-            }
-        } else if (e.getState() == Elevator.DOWN) {
-            ElevatorSupreviser queue = eQueue[elev];
-            int stop = queue.peek().getState() == CallForElevator.GOING2SRC ? queue.peek().getSrc()
-                    : queue.peek().getDest();
-            Vector<Integer> stops = queue.getStops(e.getPos(), stop, Elevator.DOWN);
+            Vector<Integer> stops = queue.getStops(e.getPos(), stop, e.getState());
             for (Integer s : stops) {
                 e.stop(s);
             }
