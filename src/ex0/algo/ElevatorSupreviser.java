@@ -27,18 +27,19 @@ public class ElevatorSupreviser {
      */
     public double bid(Elevator e, CallForElevator c) {
         // adds the call temporary
-        stops.add(c);
-
-        // stores which floors we visted in case we have the same floor twice
-        HashSet<Integer> picked = new HashSet<Integer>();
-        HashSet<Integer> dropped = new HashSet<Integer>();
         // if no jobs just calculate the time it will
         // take the elevator to complete the job
         if (stops.size() == 0) {
-            stops.remove(c);
             return findTimeToFloor(e.getPos(), c.getSrc(), e) + findTimeToFloor(c.getSrc(), c.getDest(), e);
         }
-        int acc = 0;
+
+        stops.add(c);
+        // stores which floors we visted in case we have the same floor twice
+        HashSet<Integer> picked = new HashSet<Integer>();
+        HashSet<Integer> dropped = new HashSet<Integer>();
+
+        int acc = 0; // stoprs the final amount of second it will take the elevator to finish its
+                     // tasks
         int lastFloor = e.getPos();
         // if we need to go the source
         if (stops.peek().getState() < CallForElevator.GOIND2DEST) {
@@ -108,11 +109,6 @@ public class ElevatorSupreviser {
         stops.add(c);
     }
 
-    public int getStop() {
-        mStops = new HashSet<Integer>();
-        return stops.peek().getState() == CallForElevator.GOING2SRC ? stops.peek().getSrc() : stops.peek().getDest();
-    }
-
     /**
      * calculate the stop the elevator can take in the current trip
      * 
@@ -150,6 +146,15 @@ public class ElevatorSupreviser {
         }
         mStops.addAll(ret);
         return ret;
+    }
+
+    public int getStop() {
+        mStops = new HashSet<Integer>();
+        return stops.peek().getState() == CallForElevator.GOING2SRC ? stops.peek().getSrc() : stops.peek().getDest();
+    }
+
+    public int getStopWithoutReset() {
+        return stops.peek().getState() == CallForElevator.GOING2SRC ? stops.peek().getSrc() : stops.peek().getDest();
     }
 
     /***
