@@ -121,11 +121,11 @@ public class ElevatorSupreviser {
         Vector<Integer> ret = new Vector<Integer>();
         if (type == CallForElevator.UP) {
             for (CallForElevator c : stops) {
-                if (c.getState() == CallForElevator.GOING2SRC && pos < c.getSrc() && c.getSrc() < dest) {
+                if (c.getState() <= CallForElevator.GOING2SRC && pos <= c.getSrc() && c.getSrc() < dest) {
                     if (!mStops.contains(c.getSrc()))
                         ret.add(c.getSrc());
                 }
-                if (c.getState() == CallForElevator.GOIND2DEST && pos < c.getDest() && c.getDest() < dest) {
+                if (c.getState() == CallForElevator.GOIND2DEST && pos <= c.getDest() && c.getDest() < dest) {
                     if (!mStops.contains(c.getDest()))
                         ret.add(c.getDest());
                 }
@@ -133,11 +133,11 @@ public class ElevatorSupreviser {
             }
         } else {
             for (CallForElevator c : stops) {
-                if (c.getState() == CallForElevator.GOING2SRC && dest < c.getSrc() && c.getSrc() < pos) {
+                if (c.getState() <= CallForElevator.GOING2SRC && dest < c.getSrc() && c.getSrc() <= pos) {
                     if (!mStops.contains(c.getSrc()))
                         ret.add(c.getSrc());
                 }
-                if (c.getState() == CallForElevator.GOIND2DEST && dest < c.getDest() && c.getDest() < pos) {
+                if (c.getState() == CallForElevator.GOIND2DEST && dest < c.getDest() && c.getDest() <= pos) {
                     if (!mStops.contains(c.getDest()))
                         ret.add(c.getDest());
                 }
