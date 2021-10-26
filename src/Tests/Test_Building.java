@@ -6,14 +6,14 @@ import ex0.Elevator;
 public class Test_Building implements Building {
     String name;
     int min,max,numOfElevators;
-    Elevators []elevators;
+    Elevator []elevators;
 
     public Test_Building (String name,int min,int max,int numOfElevators){
         this.name=name;
         this.min=min;
         this.max=max;
         this.numOfElevators=numOfElevators;
-        Elevators []arr=new Elevator [numOfElevators]();
+        elevators=new Test_Elevator [numOfElevators]();
     }
 
     @Override
@@ -38,6 +38,7 @@ public class Test_Building implements Building {
 
     @Override
     public Elevator getElevetor(int i) {
-        return Elevators[i];
+        return elevators[i];
     }
+
 }
