@@ -1,5 +1,7 @@
 package ex0.algo;
 
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import ex0.Building;
@@ -44,7 +46,7 @@ public class ShabatElev3Algo implements ElevatorAlgo {
         int imin = 0;
         for (int i = 0; i < eQueue.length; i++) {
             Double time = eQueue[i].bid(building.getElevetor(i), c);
-            if (time <= min) {
+            if (time < min) {
                 min = time;
                 imin = i;
             }
@@ -72,14 +74,16 @@ public class ShabatElev3Algo implements ElevatorAlgo {
                 e.goTo(stop);
             }
         }
-        // this next if statment checks if we can stop on our way.
+        // this next if statement checks if we can stop on our way.
         else if (e.getState() != Elevator.ERROR) {
             ElevatorSupreviser queue = eQueue[elev];
-            int stop = queue.getStopWithoutReset();
+            int stop = queue.getStop();
             Vector<Integer> stops = queue.getStops(e.getPos(), stop, e.getState());
-            for (Integer s : stops) {
-                e.stop(s);
-            }
+//            for (Integer s : stops) {
+//                e.stop(s);
+//            }
+            if(stops.isEmpty()) return;
+            e.stop(stops.get(stops.size()-1));
         }
     }
 

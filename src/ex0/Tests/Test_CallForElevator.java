@@ -1,20 +1,20 @@
-package Tests;
+package ex0.Tests;
 
 import ex0.CallForElevator;
-import ex0.Elevator;
 
 public class Test_CallForElevator implements CallForElevator {
-    int floor,dest;
+    int src,dest,state;
 
-    public Test_CallForElevator (int floor,int destination){
-        this.floor=floor;
+    public Test_CallForElevator (int floor, int destination){
+        this.src =floor;
         this.dest=destination;
+        state = 1;
     }
+
     @Override
     public int getState() {
-        return 0;
+        return state;
     }
-
     @Override
     public double getTime(int state) {
         return 0;
@@ -22,7 +22,7 @@ public class Test_CallForElevator implements CallForElevator {
 
     @Override
     public int getSrc() {
-        return floor;
+        return src;
     }
 
     @Override
@@ -32,11 +32,15 @@ public class Test_CallForElevator implements CallForElevator {
 
     @Override
     public int getType() {
-        if (dest<floor)
+        if (dest< src)
             return DOWN;
-        else if(dest>floor)
+        else if(dest> src)
             return UP;
         else return DONE; /** NOT SURE **/
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     @Override

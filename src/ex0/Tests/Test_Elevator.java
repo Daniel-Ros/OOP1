@@ -1,4 +1,4 @@
-package Tests;
+package ex0.Tests;
 
 import ex0.Elevator;
 
@@ -6,16 +6,17 @@ public class Test_Elevator implements Elevator {
     int minFloor,maxFloor,ID,state,position;
     double timeForOpen,timeForClose,stopTime,startTime,speed;
 
-    public Test_Elevator (int min,int max,int ID,double openTime,double closeTime,double speed,double startTime,double stopTime,int state){
-        this.minFloor=min;
-        this.maxFloor=max;
-        this.ID=ID;
-        this.timeForOpen=openTime;
-        this.timeForClose=closeTime;
+    public Test_Elevator (int pos,double speed, double openCloseSpeed, double startStopSpeed){
+        this.minFloor=-20;
+        this.maxFloor=100;
+        this.ID=0;
+        this.timeForOpen=openCloseSpeed;
+        this.timeForClose=openCloseSpeed;
         this.speed=speed;
-        this.startTime=startTime;
-        this.stopTime=stopTime;
-        this.state=state;
+        this.startTime=startStopSpeed;
+        this.stopTime=startStopSpeed;
+        this.state=LEVEL;
+        this.position = pos;
     }
 
     @Override
@@ -76,5 +77,13 @@ public class Test_Elevator implements Elevator {
     @Override
     public int getID() {
         return this.ID;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
