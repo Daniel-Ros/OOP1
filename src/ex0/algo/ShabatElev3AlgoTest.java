@@ -4,6 +4,8 @@ import ex0.CallForElevator;
 import ex0.Elevator;
 import ex0.Tests.Test_Building;
 import ex0.Tests.Test_CallForElevator;
+import ex0.simulator.Simulator_A;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,5 +50,28 @@ class ShabatElev3AlgoTest {
         b.getTestElevetor(0).setPosition(99);
         algo.cmdElevator(0);
         assertEquals(b.getTestElevetor(0).getLastGoto(),10);
+    }
+
+    @org.junit.jupiter.api.Test
+    void systemCheck(){
+        try {
+            Simulator_A.setCodeOwner("0000,0000");
+            int stage = 0; // any case in [0,9].
+            // String callFile = "data/Ex0_stage_2__.csv"; //
+            // init the simulator data: {building, calls}.
+            Simulator_A.initData(stage, null);
+
+            ElevatorAlgo ex0_alg = new ShabatElev3Algo(Simulator_A.getBuilding());
+            Simulator_A.initAlgo(ex0_alg); // init the algorithm to be used by the simulator
+
+            Simulator_A.runSim(); // run the simulation - should NOT take more than few seconds.
+
+            long time = System.currentTimeMillis();
+            String report_name = "out/Ex0_report_case_" + stage + "_" + time + "_ID_.log";
+            Simulator_A.report(report_name); // print the algorithm results in the given case, and save the log to a file.
+            assertTrue(true);
+        }catch (Exception e){
+            fail();
+        }
     }
 }
