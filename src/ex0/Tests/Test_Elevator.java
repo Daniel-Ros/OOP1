@@ -5,8 +5,11 @@ import ex0.Elevator;
 public class Test_Elevator implements Elevator {
     int minFloor,maxFloor,ID,state,position;
     double timeForOpen,timeForClose,stopTime,startTime,speed;
+    int lastGoto;
 
-    public Test_Elevator (int pos,double speed, double openCloseSpeed, double startStopSpeed){
+
+
+    public Test_Elevator (int pos, double speed, double openCloseSpeed, double startStopSpeed){
         this.minFloor=-20;
         this.maxFloor=100;
         this.ID=0;
@@ -51,11 +54,16 @@ public class Test_Elevator implements Elevator {
 
     @Override
     public boolean goTo(int floor) {
+        lastGoto = floor;
         return false;
+    }
+    public int getLastGoto() {
+        return lastGoto;
     }
 
     @Override
     public boolean stop(int floor) {
+        lastGoto = floor;
         return false;
     }
 

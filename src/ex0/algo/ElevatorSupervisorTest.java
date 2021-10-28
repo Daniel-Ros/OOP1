@@ -26,7 +26,7 @@ class ElevatorSupervisorTest {
         e.setPosition(4);
         assertEquals(supervisor.bid(e, new Test_CallForElevator(3, 0)), 24);
         supervisor.add(new Test_CallForElevator(0, -1));
-        assertEquals(supervisor.bid(e, new Test_CallForElevator(3, 0)), 35);
+        assertEquals(supervisor.bid(e, new Test_CallForElevator(3, 0)), 46);
     }
 
     @org.junit.jupiter.api.Test
@@ -63,7 +63,7 @@ class ElevatorSupervisorTest {
         assertEquals(stops.size(), 3);
         assertEquals(supervisor.getStops(1, 10, CallForElevator.UP).size(), 0);
 
-        c2.setState(2);       // simulate the evecator stoped at the second floor
+        c2.setState(CallForElevator.GOIND2DEST);       // simulate the evecator stoped at the second floor
         supervisor.getStop(); // just to clean the internal cache
         assertEquals(supervisor.getStops(1, 10, CallForElevator.UP).get(1), 3);
         supervisor.poll();
@@ -80,7 +80,7 @@ class ElevatorSupervisorTest {
         assertEquals(stops.get(0), 0);
         assertEquals(stops.get(1), 3);
         assertEquals(stops.size(), 2);
-        c2.setState(2);
+        c2.setState(CallForElevator.GOIND2DEST);
         supervisor.getStop();
         stops = supervisor.getStops(3, -1, CallForElevator.DOWN);
         assertEquals(stops.get(0), 0);
@@ -99,12 +99,12 @@ class ElevatorSupervisorTest {
         supervisor.add(c3);
 
         assertEquals(supervisor.getStop(), 5);
-        c1.setState(2);
-        c3.setState(2);
+        c1.setState(CallForElevator.GOIND2DEST);
+        c3.setState(CallForElevator.GOIND2DEST);
         assertEquals(supervisor.getStop(), 10);
         supervisor.poll();
         assertEquals(supervisor.getStop(), 2);
-        c2.setState(2);
+        c2.setState(CallForElevator.GOIND2DEST);
         assertEquals(supervisor.getStop(), 3);
         supervisor.poll();
         assertEquals(supervisor.getStop(), 1);
